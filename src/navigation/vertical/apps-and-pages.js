@@ -89,7 +89,7 @@ export default [
 
   {
     title: 'Categories',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-git-fork' },
     
     children: [
       { title: 'List', to: 'apps-categories-list'  },
@@ -100,9 +100,23 @@ export default [
     ],
   },
 
+
+  {
+    title: 'Sub Categories',
+    icon: { icon: 'tabler-git-fork' },
+    
+    children: [
+      { title: 'List', to: 'apps-subcategories-list'  },
+
+      // { title: 'Create', to: 'apps-company' },
+      
+ 
+    ],
+  },
+  
   {
     title: 'Products',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-truck' },
     
     children: [
       { title: 'List', to: 'apps-products-list'  },
@@ -113,22 +127,10 @@ export default [
     ],
   },
 
-  {
-    title: 'Sub Categories',
-    icon: { icon: 'tabler-checkbox' },
-    
-    children: [
-      { title: 'List', to: 'apps-subcategories-list'  },
-
-      // { title: 'Create', to: 'apps-company' },
-      
- 
-    ],
-  },
 
   {
     title: 'Assets',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-invoice' },
     
     children: [
       { title: 'List', to: 'apps-assets-list'  },
@@ -141,7 +143,7 @@ export default [
 
   {
     title: 'Banks',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-invoice' },
     
     children: [
       { title: 'List', to: 'apps-banks-list'  },
@@ -154,7 +156,7 @@ export default [
 
   {
     title: 'Customers',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-users' },
     
     children: [
       { title: 'List', to: 'apps-customers-list'  },
@@ -167,7 +169,7 @@ export default [
 
   {
     title: 'Suppliers',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-users' },
     
     children: [
       { title: 'List', to: 'apps-suppliers-list'  },
@@ -180,7 +182,7 @@ export default [
 
   {
     title: 'Expense Heads',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-brand-paypal' },
     
     children: [
       { title: 'List', to: 'apps-expenseheads-list'  },
@@ -194,7 +196,7 @@ export default [
 
   {
     title: 'Expense',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-brand-paypal' },
     
     children: [
       { title: 'List', to: 'apps-expenses-list'  },
@@ -207,7 +209,7 @@ export default [
 
   {
     title: 'Expense Attachments',
-    icon: { icon: 'tabler-checkbox' },
+    icon: { icon: 'tabler-brand-paypal' },
     
     children: [
       { title: 'List', to: 'apps-expenseattachments-list'  },
@@ -217,7 +219,33 @@ export default [
  
     ],
   },
+  {
+    title: 'Purchases',
+    icon: { icon: 'tabler-brand-paypal' },
+    
+    children: [
+      { title: 'List', to: 'apps-purchases-list'  },
+
+      // { title: 'Create', to: 'apps-company' },
+      
+ 
+    ],
+  },
   
+  {
+    title: 'Sales',
+    icon: { icon: 'tabler-brand-paypal' },
+    
+    children: [
+      { title: 'List', to: 'apps-sales-list'  },
+
+      // { title: 'Create', to: 'apps-company' },
+      
+ 
+    ],
+  },
+
+
   {
     title: 'User',
     icon: { icon: 'tabler-users' },

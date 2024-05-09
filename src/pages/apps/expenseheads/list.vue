@@ -1,28 +1,26 @@
 <script setup>
-import { paginationMeta } from "@api-utils/paginationMeta"
-import { VDataTableServer } from "vuetify/labs/VDataTable"
+import { onMounted, ref } from "vue"
+import { VDataTable } from "vuetify/labs/VDataTable"
 
 // 👉 Store
 const searchQuery = ref("")
 
 const isSnackbarVisible = ref(false)
-const message = ref()
-const router = useRouter()
+
+const isDeleteUser = ref(false)
+const deletedMessage = ref(null)
+
+let company = ref()
+let backup = ref()
 
 // Data table options
-const itemsPerPage = ref(10)
-const page = ref(1)
 
 
 // Headers
 const headers = [
   {
-    title: "Sub Category Name",
+    title: "Name",
     key: "name",
-  },
-  {
-    title: "Category Name",
-    key: "category_name",
   },
   {
     title: "Status",
@@ -35,19 +33,23 @@ const headers = [
   },
 ]
 
-
-const { data: companyData } = await useApi(
-  createUrl(`${baseUrl}/subcategories`),
-)
-
+onMounted(async () => {
+  await fetchUsers()
+})
 
 
-let company = ref()
-let backup = ref()
-company.value = companyData.value
-backup.value = companyData.value
+const fetchUsers = async () => {
+  try {
+    const res = await $api(`${baseUrl}/expense_heads`, {
+      method: "GET",
+    })
 
-const totalcompany = computed(() => companyData.value.company?.length)
+    company.value = res
+    backup.value = res
+  } catch (err) {
+    console.error(err)
+  }
+}
 
 const handleSearch = () => {
   const searchTerm = searchQuery.value.toLowerCase()
@@ -55,30 +57,32 @@ const handleSearch = () => {
     const res = backup.value.filter(
       user =>
         user.name.toLowerCase().includes(searchTerm) ||
-        user.address.toLowerCase().includes(searchTerm),
+        user.email.toLowerCase().includes(searchTerm),
     )
 
     company.value = res
   } else company.value = backup.value
 }
 
-const deleteService = async id => {
-  const confirmed = window.confirm("Are you sure you want to delete this type of service?")
-  if (!confirmed) {
-    return // Exit if user cancels deletion
+const deleteService = async id =>{
+  try {
+    const res = await $api(`${baseUrl}/expense_heads/${id}`, {
+      method: "DELETE",
+    })
+
+    searchQuery.value = ''
+    isDeleteUser.value=false
+    isSnackbarVisible.value = true
+    deletedMessage.value = res
+    fetchUsers()
+    
+
+
+  } catch (err) {
+    isSnackbarVisible.value = true
+    deletedMessage.value = err?.message
+    console.error(err)
   }
-
-  const res = await $api(`${baseUrl}/subcategories/${id}`, {
-    method: "DELETE",
-  })
-
-  isSnackbarVisible.value = true
-  message.value = res.message
-
-  const { data: companyData } = await useApi(createUrl(`${baseUrl}/subcategories`))
-
-  company.value = companyData.value
-  router.push({ name: 'apps-subcategories-list' })
 }
 </script>
 
@@ -89,7 +93,7 @@ const deleteService = async id => {
       :timeout="2000"
       location="top end"
     >
-      {{ message }}
+      {{ deletedMessage }}
     </VSnackbar>
     <VCard>
       <VCardText class="d-flex flex-wrap py-4 gap-4">
@@ -106,77 +110,66 @@ const deleteService = async id => {
           </div>
           <VBtn
             prepend-icon="tabler-plus"
-            @click="$router.push({name:'apps-subcategories'})"
+            @click="$router.push({name:'apps-expenseheads'})"
           >
-            Add New Sub Categories
+            Add New Expense head
           </VBtn>
         </div>
       </VCardText>
       <VDivider />
       <!-- SECTION datatable -->
-      <VDataTableServer
-        v-model:items-per-page="itemsPerPage"
-        v-model:page="page"
+      <VDataTable
         :items="company"
-        :items-length="totalcompany"
         :headers="headers"
         class="text-no-wrap"
       >
         <!-- Actions -->
         <template #item.actions="{ item }">
-          <IconBtn @click="deleteService(item.id)">
+          <IconBtn
+            color="error"
+            @click="()=>{
+              isDeleteUser = true
+              deleteUserInfo = item?.id;
+            
+            }"
+          >
             <VIcon icon="tabler-trash" />
           </IconBtn>
 
           <IconBtn
             @click="
               $router.push({
-                name: 'apps-subcategory-edit-id',
+                name: 'apps-expenseheads-edit-id',
                 params: { id: item.id }})
             "
           >
             <VIcon icon="tabler-edit" />
           </IconBtn>
         </template>
-        <!-- pagination -->
-        <template #bottom>
-          <VDivider />
-          <div class="d-flex align-center justify-sm-space-between justify-center flex-wrap gap-3 pa-5 pt-3">
-            <p class="text-sm text-disabled mb-0">
-              {{ paginationMeta({ page, itemsPerPage }, totalcompany) }}
-            </p>
-            <VPagination
-              v-model="page"
-              :length="Math.ceil(totalcompany / itemsPerPage)"
-              :total-visible="
-                $vuetify.display.xs ? 1 : Math.ceil(totalcompany / itemsPerPage)
-              "
-            >
-              <template #prev="slotProps">
-                <VBtn
-                  variant="tonal"
-                  color="default"
-                  v-bind="slotProps"
-                  :icon="false"
-                >
-                  Previous
-                </VBtn>
-              </template>
-              <template #next="slotProps">
-                <VBtn
-                  variant="tonal"
-                  color="default"
-                  v-bind="slotProps"
-                  :icon="false"
-                >
-                  Next
-                </VBtn>
-              </template>
-            </VPagination>
-          </div>
-        </template>
-      </VDataTableServer>
+      </VDataTable>
       <!-- SECTION -->
     </VCard>
+    <!-- Delete User -->
+    <VDialog
+      :model-value="isDeleteUser"
+      width="500"
+    >
+      <!-- Dialog close btn -->
+      <DialogCloseBtn @click="isDeleteUser=false" />
+
+      <!-- Dialog Content -->
+      <VCard>
+        <VCardText>Do you want to delete <span class="text-danger">Category</span>  ?</VCardText>
+   
+        <VCardText class="d-flex justify-end">
+          <VBtn
+            color="error"
+            @click="deleteService(deleteUserInfo)"
+          >
+            I accept
+          </VBtn>
+        </VCardText>
+      </VCard>
+    </VDialog>
   </section>
 </template>

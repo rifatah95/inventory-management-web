@@ -2,38 +2,53 @@
 const form = ref({
 
   name: '',
-  status: '',
+  details: '',
+  purchase_date: '',
+  price: '',
 })
+
+const statusList = ref([
+  {
+    title: 'Active',
+    value: 'active',
+  },
+  {
+    title: 'Inactive',
+    value: 'inactive',
+  },
+  
+])
 
 const isSnackbarVisible = ref(false)
 const message = ref()
 const router = useRouter()
 const route = useRoute()
 
-const updateCategory = async data => {
-  const res = await $api(`${baseUrl}/categories/${route.params.id}`, {
+const updateAssets = async data => {
+  const res = await $api(`${baseUrl}/assets/${route.params.id}`, {
     method: "PUT",
     body: data,
   })
 
-  if (res?.status == "success") {
-    isSnackbarVisible.value = true
-    message.value = res.message
-    router.push({ name: 'apps-category-list' })
-  }
+  isSnackbarVisible.value = true
+  message.value = res.message
+  router.push({ name: 'apps-assets-list' })
+  
 }
 
 onMounted(async() => {
-  const res = await $api(`${baseUrl}/categories/${route.params.id}/edit`, {
+  const res = await $api(`${baseUrl}/assets/${route.params.id}`, {
     method: "GET",
   })
 
-  const data = res?.result
+  const data = res
 
 
   form.value = {
     name: data?.name,
-    status: data?.status,
+    details: data?.details,
+    purchase_date: data?.purchase_date,
+    price: data?.price,
     
   }
 })
@@ -50,7 +65,7 @@ onMounted(async() => {
     </VSnackbar>
     <VCard>
       <VCardText>
-        <VForm @submit.prevent="updateCategory(form)">
+        <VForm @submit.prevent="updateAssets(form)">
           <VRow>
             <VCol cols="12">
               <VRow no-gutters>
@@ -62,16 +77,44 @@ onMounted(async() => {
                 >
                   <label
                     class="v-label text-body-2 text-high-emphasis"
-                    for="category_id"
-                  >Type Of Services Name</label>
+                    for="name"
+                  >Assets Name</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
                   <AppTextField
-                    id="category_id"
+                    id="name"
                     v-model="form.name"
+                    type="text"
+                    placeholder=""
+                    persistent-placeholder
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
+
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="details"
+                  >Details</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="short_order"
+                    v-model="form.details"
                     type="text"
                     placeholder=""
                     persistent-placeholder
@@ -81,7 +124,7 @@ onMounted(async() => {
             </VCol>
             <VCol cols="12">
               <VRow no-gutters>
-                <!-- 👉 status -->
+                <!-- 👉 category_id -->
                 <VCol
                   cols="12"
                   md="3"
@@ -89,25 +132,51 @@ onMounted(async() => {
                 >
                   <label
                     class="v-label text-body-2 text-high-emphasis"
-                    for="status"
-                  >Status</label>
+                    for="purchase_date"
+                  >Purchase Date</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
-                  <AppSelect
-                      :model-value="itemsPerPage"
-                      v-model="form.status"
-                      :items="[
-                        { value: 1, title: 'Active' },
-                        { value: 0, title: 'Inactive' },
-                      ]"
-                    />
+                  <AppTextField
+                    id="purchase_date"
+                    v-model="form.purchase_date"
+                    type="date"
+                    placeholder=""
+                    persistent-placeholder
+                  />
                 </VCol>
               </VRow>
             </VCol>
-           
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="price"
+                  >Price</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="price"
+                    v-model="form.price"
+                    type="number"
+                    placeholder=""
+                    persistent-placeholder
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
+        
             <!-- 👉 submit and reset button -->
             <VCol
               offset-md="3"

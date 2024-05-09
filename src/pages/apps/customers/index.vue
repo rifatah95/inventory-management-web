@@ -1,8 +1,9 @@
 <script setup>
 const form = ref({
   name: '',
-  category_id: '',
-  short_order: '',
+  address: '',
+  mobile: '',
+  email: '',
 })
 
 console.log(form)
@@ -11,15 +12,15 @@ const isSnackbarVisible = ref(false)
 const message = ref()
 const router = useRouter()
 
-const addCategory = async data => {
-  const res = await $api(`${baseUrl}/subcategories`, {
+const addCustomer = async data => {
+  const res = await $api(`${baseUrl}/customers`, {
     method: "POST",
     body: data,
   })
 
   isSnackbarVisible.value = true
   message.value = res.message
-  router.push({ name: 'apps-subcategories-list' })
+  router.push({ name: 'apps-customers-list' })
   
 }
 </script>
@@ -35,7 +36,7 @@ const addCategory = async data => {
     </VSnackbar>
     <VCard>
       <VCardText>
-        <VForm @submit.prevent="addCategory(form)">
+        <VForm @submit.prevent="addCustomer(form)">
           <VRow>
             <VCol cols="12">
               <VRow no-gutters>
@@ -47,18 +48,18 @@ const addCategory = async data => {
                 >
                   <label
                     class="v-label text-body-2 text-high-emphasis"
-                    for="category_id"
-                  >Sub Categories Name</label>
+                    for="name"
+                  >Customer Name</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
                   <AppTextField
-                    id="category_id"
+                    id="name"
                     v-model="form.name"
                     type="text"
-                    placeholder=""
+                    placeholder="Name"
                     persistent-placeholder
                   />
                 </VCol>
@@ -75,24 +76,23 @@ const addCategory = async data => {
                 >
                   <label
                     class="v-label text-body-2 text-high-emphasis"
-                    for="category_id"
-                  >Categories Name</label>
+                    for="address"
+                  >Address</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
                   <AppTextField
-                    id="category_id"
-                    v-model="form.category_id"
+                    id="address"
+                    v-model="form.address"
                     type="text"
-                    placeholder=""
+                    placeholder="Address"
                     persistent-placeholder
                   />
                 </VCol>
               </VRow>
             </VCol>
-
             <VCol cols="12">
               <VRow no-gutters>
                 <!-- 👉 category_id -->
@@ -103,18 +103,45 @@ const addCategory = async data => {
                 >
                   <label
                     class="v-label text-body-2 text-high-emphasis"
-                    for="short_order"
-                  >Short Order</label>
+                    for="mobile"
+                  >Mobile</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
                   <AppTextField
-                    id="short_order"
-                    v-model="form.short_order"
+                    id="mobile"
+                    v-model="form.mobile"
                     type="text"
-                    placeholder=""
+                    placeholder="Mobile"
+                    persistent-placeholder
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="email"
+                  >E-mail</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="email"
+                    v-model="form.email"
+                    type="email"
+                    placeholder="E-mail"
                     persistent-placeholder
                   />
                 </VCol>

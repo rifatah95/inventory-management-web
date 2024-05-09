@@ -1,27 +1,40 @@
 <script setup>
 const form = ref({
   name: '',
-  category_id: '',
+  model: '',
+  details: '',
+  price: '',
   short_order: '',
+  subcategory_id: '',
 })
 
-console.log(form)
+const subCategoryList = ref([])
 
 const isSnackbarVisible = ref(false)
 const message = ref()
 const router = useRouter()
 
-const addCategory = async data => {
-  const res = await $api(`${baseUrl}/subcategories`, {
+const addProduct = async data => {
+  const res = await $api(`${baseUrl}/products`, {
     method: "POST",
     body: data,
   })
 
   isSnackbarVisible.value = true
   message.value = res.message
-  router.push({ name: 'apps-subcategories-list' })
+  router.push({ name: 'apps-products-list' })
   
 }
+
+onMounted(async () => {
+
+  const categoryDataResponse = await $api(`${baseUrl}/subcategories`, {
+    method: "GET",
+  })
+
+  subCategoryList.value = categoryDataResponse.map(service => ({ name: service.name, id: service.id }))
+
+})
 </script>
 
 <template>
@@ -35,7 +48,7 @@ const addCategory = async data => {
     </VSnackbar>
     <VCard>
       <VCardText>
-        <VForm @submit.prevent="addCategory(form)">
+        <VForm @submit.prevent="addProduct(form)">
           <VRow>
             <VCol cols="12">
               <VRow no-gutters>
@@ -48,7 +61,7 @@ const addCategory = async data => {
                   <label
                     class="v-label text-body-2 text-high-emphasis"
                     for="category_id"
-                  >Sub Categories Name</label>
+                  >Product Name</label>
                 </VCol>
                 <VCol
                   cols="12"
@@ -64,6 +77,60 @@ const addCategory = async data => {
                 </VCol>
               </VRow>
             </VCol>
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="category_id"
+                  >Model</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="category_id"
+                    v-model="form.model"
+                    type="text"
+                    placeholder=""
+                    persistent-placeholder
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="category_id"
+                  >Details</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="category_id"
+                    v-model="form.details"
+                    type="text"
+                    placeholder=""
+                    persistent-placeholder
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
 
             <VCol cols="12">
               <VRow no-gutters>
@@ -76,7 +143,7 @@ const addCategory = async data => {
                   <label
                     class="v-label text-body-2 text-high-emphasis"
                     for="category_id"
-                  >Categories Name</label>
+                  >Price</label>
                 </VCol>
                 <VCol
                   cols="12"
@@ -84,14 +151,16 @@ const addCategory = async data => {
                 >
                   <AppTextField
                     id="category_id"
-                    v-model="form.category_id"
-                    type="text"
+                    v-model="form.price"
+                    type="number"
                     placeholder=""
                     persistent-placeholder
                   />
                 </VCol>
               </VRow>
             </VCol>
+
+            
 
             <VCol cols="12">
               <VRow no-gutters>
@@ -113,10 +182,42 @@ const addCategory = async data => {
                   <AppTextField
                     id="short_order"
                     v-model="form.short_order"
-                    type="text"
+                    type="number"
                     placeholder=""
                     persistent-placeholder
                   />
+                </VCol>
+              </VRow>
+            </VCol>
+
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="subcategory_id"
+                  >SubCategories</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <select
+                    v-model="form.subcategory_id"
+                    class="form-select custom-select"
+                  >
+                    <option
+                      v-for="i in subCategoryList"
+                      :value="i.id"
+                    >
+                      {{ i.name }}
+                    </option>
+                  </select>
                 </VCol>
               </VRow>
             </VCol>
@@ -145,3 +246,22 @@ const addCategory = async data => {
     </VCard>
   </section>
 </template>
+
+<style scoped>
+.custom-select {
+  display: inline-block;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  appearance: none;
+  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat;
+  block-size: calc(1.5em + .75rem + 2px);
+  color: rgb(118, 118, 118);
+  font-size: 1rem;
+  font-weight: 400;
+  inline-size: 100%;
+  line-height: 1.5;
+  padding-block: .375rem;
+  padding-inline: .75rem 1.75rem;
+  vertical-align: middle;
+}
+</style>

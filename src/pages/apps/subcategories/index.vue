@@ -7,6 +7,7 @@ const form = ref({
 
 console.log(form)
 
+const categoryList = ref([])
 const isSnackbarVisible = ref(false)
 const message = ref()
 const router = useRouter()
@@ -22,6 +23,15 @@ const addCategory = async data => {
   router.push({ name: 'apps-subcategories-list' })
   
 }
+
+onMounted(async () => {
+
+  const categoryDataResponse = await $api(`${baseUrl}/categories`, {
+    method: "GET",
+  })
+
+  categoryList.value = categoryDataResponse.map(service => ({ name: service.name, id: service.id }))
+})
 </script>
 
 <template>
@@ -64,31 +74,34 @@ const addCategory = async data => {
                 </VCol>
               </VRow>
             </VCol>
-
             <VCol cols="12">
               <VRow no-gutters>
-                <!-- 👉 category_id -->
+                <!-- 👉 Category_id -->
                 <VCol
                   cols="12"
                   md="3"
                   class="d-flex align-items-center"
                 >
                   <label
-                    class="v-label text-body-2 text-high-emphasis"
-                    for="category_id"
+                    class="v-label mb-1 text-body-2 text-high-emphasis"
+                    for="app-select-Select"
                   >Categories Name</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
-                  <AppTextField
-                    id="category_id"
+                  <select
                     v-model="form.category_id"
-                    type="text"
-                    placeholder=""
-                    persistent-placeholder
-                  />
+                    class="form-select custom-select"
+                  >
+                    <option
+                      v-for="i in categoryList"
+                      :value="i.id"
+                    >
+                      {{ i.name }}
+                    </option>
+                  </select>
                 </VCol>
               </VRow>
             </VCol>
@@ -145,3 +158,22 @@ const addCategory = async data => {
     </VCard>
   </section>
 </template>
+
+<style scoped>
+.custom-select {
+  display: inline-block;
+  border: 1px solid #ced4da;
+  border-radius: .25rem;
+  appearance: none;
+  background: #fff url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' width='4' height='5' viewBox='0 0 4 5'%3e%3cpath fill='%23343a40' d='M2 0L0 2h4zm0 5L0 3h4z'/%3e%3c/svg%3e") right .75rem center/8px 10px no-repeat;
+  block-size: calc(1.5em + .75rem + 2px);
+  color: rgb(118, 118, 118);
+  font-size: 1rem;
+  font-weight: 400;
+  inline-size: 100%;
+  line-height: 1.5;
+  padding-block: .375rem;
+  padding-inline: .75rem 1.75rem;
+  vertical-align: middle;
+}
+</style>

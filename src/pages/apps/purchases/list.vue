@@ -19,12 +19,8 @@ let backup = ref()
 // Headers
 const headers = [
   {
-    title: "Sub Category Name",
+    title: "Name",
     key: "name",
-  },
-  {
-    title: "Category Name",
-    key: "category_name",
   },
   {
     title: "Status",
@@ -38,13 +34,13 @@ const headers = [
 ]
 
 onMounted(async () => {
-  await fetchSubcategory()
+  await fetchUsers()
 })
 
 
-const fetchSubcategory = async () => {
+const fetchUsers = async () => {
   try {
-    const res = await $api(`${baseUrl}/subcategories`, {
+    const res = await $api(`${baseUrl}/categories`, {
       method: "GET",
     })
 
@@ -54,11 +50,6 @@ const fetchSubcategory = async () => {
     console.error(err)
   }
 }
-
-
-
-
-
 
 const handleSearch = () => {
   const searchTerm = searchQuery.value.toLowerCase()
@@ -73,9 +64,9 @@ const handleSearch = () => {
   } else company.value = backup.value
 }
 
-const deleteSubcategory = async id =>{
+const deleteService = async id =>{
   try {
-    const res = await $api(`${baseUrl}/subcategories/${id}`, {
+    const res = await $api(`${baseUrl}/purchases/${id}`, {
       method: "DELETE",
     })
 
@@ -83,7 +74,7 @@ const deleteSubcategory = async id =>{
     isDeleteUser.value=false
     isSnackbarVisible.value = true
     deletedMessage.value = res
-    fetchSubcategory()
+    fetchUsers()
     
 
 
@@ -119,9 +110,9 @@ const deleteSubcategory = async id =>{
           </div>
           <VBtn
             prepend-icon="tabler-plus"
-            @click="$router.push({name:'apps-subcategories'})"
+            @click="$router.push({name:'apps-purchases'})"
           >
-            Add New SubCategories
+            Add New Purchases
           </VBtn>
         </div>
       </VCardText>
@@ -138,7 +129,7 @@ const deleteSubcategory = async id =>{
             color="error"
             @click="()=>{
               isDeleteUser = true
-              deleteSubcategoryInfo = item?.id;
+              deleteUserInfo = item?.id;
             
             }"
           >
@@ -148,7 +139,7 @@ const deleteSubcategory = async id =>{
           <IconBtn
             @click="
               $router.push({
-                name: 'apps-subcategories-edit-id',
+                name: 'apps-categories-edit-id',
                 params: { id: item.id }})
             "
           >
@@ -173,7 +164,7 @@ const deleteSubcategory = async id =>{
         <VCardText class="d-flex justify-end">
           <VBtn
             color="error"
-            @click="deleteSubcategory(deleteSubcategoryInfo)"
+            @click="deleteService(deleteUserInfo)"
           >
             I accept
           </VBtn>

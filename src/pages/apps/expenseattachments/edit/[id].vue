@@ -1,9 +1,47 @@
 <script setup>
 const form = ref({
 
-  name: '',
-  status: '',
+  expense_id: '',
+  file: '',
 })
+
+const statusList = ref([
+  {
+    title: 'Active',
+    value: 'active',
+  },
+  {
+    title: 'Inactive',
+    value: 'inactive',
+  },
+  
+])
+
+let categoryList = ref()
+let backup = ref()
+
+
+
+
+const fetchUsers = async () => {
+  try {
+    const res = await $api(`${baseUrl}/expenses`, {
+      method: "GET",
+    })
+
+    
+    categoryList.value = res.map(permission => ({
+      title: permission.expense_head.name,
+      value: permission.id,
+    }))
+    
+    backup.value = res
+  } catch (err) {
+    console.error(err)
+  }
+}
+
+
 
 const isSnackbarVisible = ref(false)
 const message = ref()
@@ -11,30 +49,35 @@ const router = useRouter()
 const route = useRoute()
 
 const updateCategory = async data => {
-  const res = await $api(`${baseUrl}/categories/${route.params.id}`, {
+  const res = await $api(`${baseUrl}/expense_attachments/${route.params.id}`, {
     method: "PUT",
     body: data,
   })
 
-  if (res?.status == "success") {
-    isSnackbarVisible.value = true
-    message.value = res.message
-    router.push({ name: 'apps-category-list' })
-  }
+  
+  isSnackbarVisible.value = true
+  message.value = res.message
+  router.push({ name: 'apps-expenseattachments-list' })
+  
 }
 
-onMounted(async() => {
-  const res = await $api(`${baseUrl}/categories/${route.params.id}/edit`, {
+onMounted(async () => {
+
+  await fetchUsers()
+
+  const res = await $api(`${baseUrl}/expense_attachments/${route.params.id}`, {
     method: "GET",
   })
 
-  const data = res?.result
 
+  const data = res
+
+
+  const categoryid = categoryList.value.find(item => item?.value == data.expense_id)
 
   form.value = {
-    name: data?.name,
-    status: data?.status,
-    
+    file: data?.file,
+    expense_id: categoryid.value,
   }
 })
 </script>
@@ -54,33 +97,6 @@ onMounted(async() => {
           <VRow>
             <VCol cols="12">
               <VRow no-gutters>
-                <!-- 👉 category_id -->
-                <VCol
-                  cols="12"
-                  md="3"
-                  class="d-flex align-items-center"
-                >
-                  <label
-                    class="v-label text-body-2 text-high-emphasis"
-                    for="category_id"
-                  >Type Of Services Name</label>
-                </VCol>
-                <VCol
-                  cols="12"
-                  md="9"
-                >
-                  <AppTextField
-                    id="category_id"
-                    v-model="form.name"
-                    type="text"
-                    placeholder=""
-                    persistent-placeholder
-                  />
-                </VCol>
-              </VRow>
-            </VCol>
-            <VCol cols="12">
-              <VRow no-gutters>
                 <!-- 👉 status -->
                 <VCol
                   cols="12"
@@ -90,20 +106,45 @@ onMounted(async() => {
                   <label
                     class="v-label text-body-2 text-high-emphasis"
                     for="status"
-                  >Status</label>
+                  >Expense</label>
                 </VCol>
                 <VCol
                   cols="12"
                   md="9"
                 >
                   <AppSelect
-                      :model-value="itemsPerPage"
-                      v-model="form.status"
-                      :items="[
-                        { value: 1, title: 'Active' },
-                        { value: 0, title: 'Inactive' },
-                      ]"
-                    />
+                    v-model="form.expense_id"
+                    placeholder="Select category"
+                    :items="categoryList"
+                  />
+                </VCol>
+              </VRow>
+            </VCol>
+
+            <VCol cols="12">
+              <VRow no-gutters>
+                <!-- 👉 category_id -->
+                <VCol
+                  cols="12"
+                  md="3"
+                  class="d-flex align-items-center"
+                >
+                  <label
+                    class="v-label text-body-2 text-high-emphasis"
+                    for="file"
+                  >File</label>
+                </VCol>
+                <VCol
+                  cols="12"
+                  md="9"
+                >
+                  <AppTextField
+                    id="file"
+                    v-model="form.file"
+                    type="text"
+                    placeholder=""
+                    persistent-placeholder
+                  />
                 </VCol>
               </VRow>
             </VCol>
@@ -116,7 +157,7 @@ onMounted(async() => {
               class="d-flex gap-4"
             >
               <VBtn type="submit">
-                Submit
+                Update
               </VBtn>
               <VBtn
                 color="secondary"
